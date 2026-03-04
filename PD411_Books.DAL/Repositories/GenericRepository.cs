@@ -60,7 +60,7 @@ namespace PD411_Books.DAL.Repositories
 
         public IQueryable<TEntity> GetAll()
         {
-            return _context.Set<TEntity>();
+            return _context.Set<TEntity>().AsNoTracking();
         }
     }
 }

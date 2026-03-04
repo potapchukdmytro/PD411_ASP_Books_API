@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PD411_Books.DAL;
 using PD411_Books.DAL.Entities;
+using PD411_Books.DAL.Repositories;
 
 namespace PD411_Books.API.Controllers
 {
@@ -10,16 +11,18 @@ namespace PD411_Books.API.Controllers
     public class AuthorController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly AuthorRepository _authorRepository;
 
-        public AuthorController(AppDbContext context)
+        public AuthorController(AppDbContext context, AuthorRepository authorRepository)
         {
             _context = context;
+            _authorRepository = authorRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            var authors = await _context.Authors.ToListAsync();
+            var authors = await _authorRepository.Authors.ToListAsync();
 
             return Ok(authors);
         }   
@@ -27,9 +30,8 @@ namespace PD411_Books.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody]AuthorEntity entity)
         {
-            await _context.Authors.AddAsync(entity);
-            int res = await _context.SaveChangesAsync();
-            if(res == 0)
+            bool res = await _authorRepository.CreateAsync(entity);
+            if(!res)
             {
                 return BadRequest("Не вдалося створити автора");
             }
@@ -38,15 +40,27 @@ namespace PD411_Books.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync()
+        public async Task<IActionResult> UpdateAsync([FromBody] AuthorEntity entity)
         {
-            return Ok();
+            bool res = await _authorRepository.UpdateAsync(entity);
+            if (!res)
+            {
+                return BadRequest("Не вдалося оновити автора");
+            }
+
+            return Ok($"Автор '{entity.Name}' успішно оновлений");
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteAsync()
+        public async Task<IActionResult> DeleteAsync([FromQuery]int id)
         {
-            return Ok();
+            bool res = await _authorRepository.DeleteAsync(id);
+            if (!res)
+            {
+                return BadRequest("Не вдалося видалити автора");
+            }
+
+            return Ok($"Автор успішно видалений");
         }
     }
 }
