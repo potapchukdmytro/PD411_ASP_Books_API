@@ -13,6 +13,7 @@ namespace PD411_Books.DAL
 
         public DbSet<BookEntity> Books { get; set; }
         public DbSet<AuthorEntity> Authors { get; set; }
+        public DbSet<GenreEntity> Genres { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -51,12 +52,27 @@ namespace PD411_Books.DAL
                 .HasMaxLength(100);
             });
 
+            // Genres
+            builder.Entity<GenreEntity>(e =>
+            {
+                e.HasKey(g => g.Id);
+
+                e.Property(g => g.Name)
+                .HasMaxLength(50)
+                .IsRequired();
+            });
+
             // Relationships
             builder.Entity<BookEntity>()
                 .HasOne(b => b.Author)
                 .WithMany(a => a.Books)
                 .HasForeignKey(b => b.AuthorId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<BookEntity>()
+                .HasMany(b => b.Genres)
+                .WithMany(g => g.Books)
+                .UsingEntity("BookGenres");
 
             base.OnModelCreating(builder);
         }

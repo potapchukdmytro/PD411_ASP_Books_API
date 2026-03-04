@@ -12,5 +12,7 @@
 
         public int? AuthorId { get; set; }
         public AuthorEntity? Author { get; set; }
+
+        public List<GenreEntity> Genres { get; set; } = [];
     }
 }
