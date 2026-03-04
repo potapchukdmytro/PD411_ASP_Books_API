@@ -1,9 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using PD411_Books.DAL;
+using PD411_Books.DAL.Initializer;
+using PD411_Books.DAL.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add repositories
+builder.Services.AddScoped<AuthorRepository>();
+
+// Add services
+
 
 // Add dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -46,5 +52,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.SeedAsync().Wait();
 
 app.Run();

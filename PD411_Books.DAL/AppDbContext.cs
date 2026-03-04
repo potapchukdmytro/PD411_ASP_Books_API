@@ -57,6 +57,9 @@ namespace PD411_Books.DAL
             {
                 e.HasKey(g => g.Id);
 
+                e.HasIndex(g => g.Name)
+                .IsUnique();
+
                 e.Property(g => g.Name)
                 .HasMaxLength(50)
                 .IsRequired();

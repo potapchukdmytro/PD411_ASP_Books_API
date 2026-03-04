@@ -12,7 +12,7 @@ using PD411_Books.DAL;
 namespace PD411_Books.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260304132214_Genres")]
+    [Migration("20260304133510_Genres")]
     partial class Genres
     {
         /// <inheritdoc />
@@ -122,6 +122,9 @@ namespace PD411_Books.DAL.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Genres");
                 });

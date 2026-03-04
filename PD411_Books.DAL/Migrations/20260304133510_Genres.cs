@@ -52,6 +52,12 @@ namespace PD411_Books.DAL.Migrations
                 name: "IX_BookGenres_GenresId",
                 table: "BookGenres",
                 column: "GenresId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Genres_Name",
+                table: "Genres",
+                column: "Name",
+                unique: true);
         }
 
         /// <inheritdoc />
