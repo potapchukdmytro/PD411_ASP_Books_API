@@ -16,8 +16,9 @@ builder.Services.AddScoped<AuthorService>();
 // Add dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    string? connectionString = builder.Configuration.GetConnectionString("LocalDb");
-    options.UseNpgsql(connectionString);
+    string? localDb = builder.Configuration.GetConnectionString("LocalDb");
+    string? aivenDb = builder.Configuration.GetConnectionString("AivenDb");
+    options.UseNpgsql(aivenDb);
 });
 
 builder.Services.AddControllers();
