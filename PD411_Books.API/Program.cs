@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PD411_Books.BLL.Services;
 using PD411_Books.DAL;
 using PD411_Books.DAL.Initializer;
 using PD411_Books.DAL.Repositories;
@@ -7,9 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add repositories
 builder.Services.AddScoped<AuthorRepository>();
+builder.Services.AddScoped<BookRepository>();
 
 // Add services
-
+builder.Services.AddScoped<AuthorService>();
 
 // Add dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>

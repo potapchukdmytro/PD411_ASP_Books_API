@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PD411_Books.DAL;
-using PD411_Books.DAL.Entities;
-using PD411_Books.DAL.Repositories;
+using PD411_Books.API.Extensions;
+using PD411_Books.BLL.Dtos.Author;
+using PD411_Books.BLL.Services;
 
 namespace PD411_Books.API.Controllers
 {
@@ -10,57 +9,46 @@ namespace PD411_Books.API.Controllers
     [Route("api/author")]
     public class AuthorController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly AuthorRepository _authorRepository;
+        private readonly AuthorService _authorService;
 
-        public AuthorController(AppDbContext context, AuthorRepository authorRepository)
+        public AuthorController(AuthorService authorService)
         {
-            _context = context;
-            _authorRepository = authorRepository;
+            _authorService = authorService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            var authors = await _authorRepository.Authors.ToListAsync();
+            var response = await _authorService.GetAllAsync();
+            return this.GetAction(response);
+        }
 
-            return Ok(authors);
-        }   
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAsync(int id)
+        {
+            var response = await _authorService.GetByIdAsync(id);
+            return this.GetAction(response);
+        }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody]AuthorEntity entity)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateAuthorDto dto)
         {
-            bool res = await _authorRepository.CreateAsync(entity);
-            if(!res)
-            {
-                return BadRequest("Не вдалося створити автора");
-            }
-
-            return Ok($"Автор '{entity.Name}' успішно створений");
+            var response = await _authorService.CreateAsync(dto);
+            return this.GetAction(response);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync([FromBody] AuthorEntity entity)
+        public async Task<IActionResult> UpdateAsync([FromBody] UpdateAuthorDto dto)
         {
-            bool res = await _authorRepository.UpdateAsync(entity);
-            if (!res)
-            {
-                return BadRequest("Не вдалося оновити автора");
-            }
-
-            return Ok($"Автор '{entity.Name}' успішно оновлений");
+            var response = await _authorService.UpdateAsync(dto);
+            return this.GetAction(response);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAsync([FromQuery]int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            bool res = await _authorRepository.DeleteAsync(id);
-            if (!res)
-            {
-                return BadRequest("Не вдалося видалити автора");
-            }
-
-            return Ok($"Автор успішно видалений");
+            var response = await _authorService.DeleteAsync(id);
+            return this.GetAction(response);
         }
     }
 }
