@@ -8,20 +8,33 @@ namespace PD411_Books.BLL.Services
     public class AuthorService
     {
         private readonly AuthorRepository _authorRepository;
+        private readonly ImageService _imageService;
 
-        public AuthorService(AuthorRepository authorRepository)
+        public AuthorService(AuthorRepository authorRepository, ImageService imageService)
         {
             _authorRepository = authorRepository;
+            _imageService = imageService;
         }
 
-        public async Task<ServiceResponse> CreateAsync(CreateAuthorDto dto)
+        public async Task<ServiceResponse> CreateAsync(CreateAuthorDto dto, string imagesPath)
         {
             var entity = new AuthorEntity
             {
                 Name = dto.Name,
-                BirthDate = dto.BirthDate,
-                Image = dto.Image,
+                BirthDate = dto.BirthDate
             };
+
+            if(dto.Image != null && !string.IsNullOrEmpty(imagesPath))
+            {
+                ServiceResponse response = await _imageService.SaveAsync(dto.Image, imagesPath);
+
+                if(!response.Success)
+                {
+                    return response;
+                }
+
+                entity.Image = response.Payload!.ToString()!;
+            }
 
             bool res = await _authorRepository.CreateAsync(entity);
 

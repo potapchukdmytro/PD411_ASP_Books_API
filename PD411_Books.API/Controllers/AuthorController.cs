@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PD411_Books.API.Extensions;
+using PD411_Books.API.Settings;
 using PD411_Books.BLL.Dtos.Author;
 using PD411_Books.BLL.Services;
 
@@ -10,10 +11,14 @@ namespace PD411_Books.API.Controllers
     public class AuthorController : ControllerBase
     {
         private readonly AuthorService _authorService;
+        private readonly string _storagePath;
 
-        public AuthorController(AuthorService authorService)
+        public AuthorController(AuthorService authorService, IWebHostEnvironment environment)
         {
             _authorService = authorService;
+
+            string rootPath = environment.ContentRootPath;
+            _storagePath = Path.Combine(rootPath, StaticFilesSettings.StorageDir);
         }
 
         [HttpGet]
@@ -31,9 +36,11 @@ namespace PD411_Books.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateAuthorDto dto)
+        public async Task<IActionResult> CreateAsync([FromForm] CreateAuthorDto dto)
         {
-            var response = await _authorService.CreateAsync(dto);
+            string authorsPath = Path.Combine(_storagePath, StaticFilesSettings.AuthorsDir);
+
+            var response = await _authorService.CreateAsync(dto, authorsPath);
             return this.GetAction(response);
         }
 

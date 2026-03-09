@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using PD411_Books.API.Settings;
 using PD411_Books.BLL.Services;
 using PD411_Books.DAL;
 using PD411_Books.DAL.Initializer;
@@ -12,6 +14,7 @@ builder.Services.AddScoped<BookRepository>();
 
 // Add services
 builder.Services.AddScoped<AuthorService>();
+builder.Services.AddScoped<ImageService>();
 
 // Add dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -51,6 +54,24 @@ if (app.Environment.IsDevelopment())
 app.UseCors(corsName);
 
 app.UseHttpsRedirection();
+
+// Static files
+string root = app.Environment.ContentRootPath;
+string storagePath = Path.Combine(root, StaticFilesSettings.StorageDir);
+string booksPath = Path.Combine(storagePath, StaticFilesSettings.BooksDir);
+string authorsPath = Path.Combine(storagePath, StaticFilesSettings.AuthorsDir);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(booksPath),
+    RequestPath = StaticFilesSettings.BookUrl
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(authorsPath),
+    RequestPath = StaticFilesSettings.AuthorUrl
+});
 
 app.UseAuthorization();
 
