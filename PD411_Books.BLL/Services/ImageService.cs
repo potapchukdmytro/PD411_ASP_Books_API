@@ -43,9 +43,22 @@ namespace PD411_Books.BLL.Services
             }
         }
 
-        //public async Task<ServiceResponse> Remove()
-        //{
+        public ServiceResponse Delete(string imagePath)
+        {
+            if(File.Exists(imagePath))
+            {
+                File.Delete(imagePath);
+                return new ServiceResponse
+                {
+                    Message = "Зображення успішно видалено"
+                };
+            }
 
-        //}
+            return new ServiceResponse
+            {
+                Success = false,
+                Message = $"Зображення '{imagePath}' не знайдено"
+            };
+        }
     }
 }

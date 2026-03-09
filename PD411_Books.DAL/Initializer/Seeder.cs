@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PD411_Books.DAL.Entities;
-using PD411_Books.DAL.Repositories;
-using System.Net;
 
 namespace PD411_Books.DAL.Initializer
 {

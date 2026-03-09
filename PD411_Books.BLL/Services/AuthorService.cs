@@ -60,7 +60,7 @@ namespace PD411_Books.BLL.Services
             };
         }
 
-        public async Task<ServiceResponse> UpdateAsync(UpdateAuthorDto dto)
+        public async Task<ServiceResponse> UpdateAsync(UpdateAuthorDto dto, string imagesPath)
         {
             var entity = await _authorRepository.GetByIdAsync(dto.Id);
 
@@ -76,7 +76,29 @@ namespace PD411_Books.BLL.Services
             string oldName = entity.Name;
             entity.Name = dto.Name;
             entity.BirthDate = dto.BirthDate;
-            entity.Image = dto.Image;
+
+            if(dto.Image != null && !string.IsNullOrEmpty(imagesPath))
+            {
+                if (!string.IsNullOrEmpty(entity.Image))
+                {
+                    string imagePath = Path.Combine(imagesPath, entity.Image);
+                    var deleteResponse = _imageService.Delete(imagePath);
+
+                    if (!deleteResponse.Success)
+                    {
+                        return deleteResponse;
+                    }
+                }
+
+                var saveResponse = await _imageService.SaveAsync(dto.Image, imagesPath);
+
+                if (!saveResponse.Success)
+                {
+                    return saveResponse;
+                }
+
+                entity.Image = saveResponse.Payload!.ToString()!;
+            }
 
             bool res = await _authorRepository.UpdateAsync(entity);
 
@@ -102,7 +124,7 @@ namespace PD411_Books.BLL.Services
             };
         }
 
-        public async Task<ServiceResponse> DeleteAsync(int id)
+        public async Task<ServiceResponse> DeleteAsync(int id, string imagesPath)
         {
             var entity = await _authorRepository.GetByIdAsync(id);
 
@@ -113,6 +135,17 @@ namespace PD411_Books.BLL.Services
                     Success = false,
                     Message = $"Автора з id {id} не існує"
                 };
+            }
+
+            if(!string.IsNullOrEmpty(entity.Image))
+            {
+                string imagePath = Path.Combine(imagesPath, entity.Image);
+                var response = _imageService.Delete(imagePath);
+
+                if(!response.Success)
+                {
+                    return response;
+                }
             }
 
             bool res = await _authorRepository.DeleteAsync(entity);

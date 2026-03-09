@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace PD411_Books.BLL.Dtos.Author
 {
@@ -9,6 +10,6 @@ namespace PD411_Books.BLL.Dtos.Author
         [Required]
         public string Name { get; set; } = string.Empty;
         public DateTime BirthDate { get; set; } = DateTime.UtcNow;
-        public string? Image { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }
