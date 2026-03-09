@@ -58,19 +58,29 @@ app.UseHttpsRedirection();
 // Static files
 string root = app.Environment.ContentRootPath;
 string storagePath = Path.Combine(root, StaticFilesSettings.StorageDir);
-string booksPath = Path.Combine(storagePath, StaticFilesSettings.BooksDir);
-string authorsPath = Path.Combine(storagePath, StaticFilesSettings.AuthorsDir);
 
+// Books
+string booksPath = Path.Combine(storagePath, StaticFilesSettings.BooksDir);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(booksPath),
     RequestPath = StaticFilesSettings.BookUrl
 });
 
+//Authors
+string authorsPath = Path.Combine(storagePath, StaticFilesSettings.AuthorsDir);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(authorsPath),
     RequestPath = StaticFilesSettings.AuthorUrl
+});
+
+// Share
+string sharePath = Path.Combine(storagePath, StaticFilesSettings.ShareDir);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(sharePath),
+    RequestPath = StaticFilesSettings.ShareUrl
 });
 
 app.UseAuthorization();
