@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PD411_Books.BLL.Dtos.Author;
 using PD411_Books.DAL.Entities;
 using PD411_Books.DAL.Repositories;
@@ -9,22 +10,20 @@ namespace PD411_Books.BLL.Services
     {
         private readonly AuthorRepository _authorRepository;
         private readonly ImageService _imageService;
+        private readonly IMapper _mapper;
 
-        public AuthorService(AuthorRepository authorRepository, ImageService imageService)
+        public AuthorService(AuthorRepository authorRepository, ImageService imageService, IMapper mapper)
         {
             _authorRepository = authorRepository;
             _imageService = imageService;
+            _mapper = mapper;
         }
 
         public async Task<ServiceResponse> CreateAsync(CreateAuthorDto dto, string imagesPath)
         {
-            var entity = new AuthorEntity
-            {
-                Name = dto.Name,
-                BirthDate = dto.BirthDate
-            };
+            var entity = _mapper.Map<AuthorEntity>(dto);
 
-            if(dto.Image != null && !string.IsNullOrEmpty(imagesPath))
+            if (dto.Image != null && !string.IsNullOrEmpty(imagesPath))
             {
                 ServiceResponse response = await _imageService.SaveAsync(dto.Image, imagesPath);
 
@@ -50,13 +49,7 @@ namespace PD411_Books.BLL.Services
             return new ServiceResponse
             {
                 Message = $"Автор '{entity.Name}' успішно доданий",
-                Payload = new AuthorDto
-                {
-                    Id = entity.Id,
-                    BirthDate = entity.BirthDate,
-                    Image = entity.Image,
-                    Name = entity.Name
-                }
+                Payload = _mapper.Map<AuthorDto>(entity)
             };
         }
 
@@ -74,8 +67,7 @@ namespace PD411_Books.BLL.Services
             }
 
             string oldName = entity.Name;
-            entity.Name = dto.Name;
-            entity.BirthDate = dto.BirthDate;
+            entity = _mapper.Map(dto, entity);
 
             if(dto.Image != null && !string.IsNullOrEmpty(imagesPath))
             {
@@ -114,13 +106,7 @@ namespace PD411_Books.BLL.Services
             return new ServiceResponse
             {
                 Message = $"Автор '{oldName}' успішно оновлений",
-                Payload = new AuthorDto
-                {
-                    Id = entity.Id,
-                    BirthDate = entity.BirthDate,
-                    Image = entity.Image,
-                    Name = entity.Name
-                }
+                Payload = _mapper.Map<AuthorDto>(entity)
             };
         }
 
@@ -133,7 +119,7 @@ namespace PD411_Books.BLL.Services
                 return new ServiceResponse
                 {
                     Success = false,
-                    Message = $"Автора з id {id} не існує"
+                    Message = $"Автор з id {id} не існує"
                 };
             }
 
@@ -162,13 +148,7 @@ namespace PD411_Books.BLL.Services
             return new ServiceResponse
             {
                 Message = $"Автор '{entity.Name}' успішно видалений",
-                Payload = new AuthorDto
-                {
-                    Id = entity.Id,
-                    BirthDate = entity.BirthDate,
-                    Image = entity.Image,
-                    Name = entity.Name
-                }
+                Payload = _mapper.Map<AuthorDto>(entity)
             };
         }
 
@@ -181,28 +161,22 @@ namespace PD411_Books.BLL.Services
                 return new ServiceResponse
                 {
                     Success = false,
-                    Message = $"Автора з id {id} не існує"
+                    Message = $"Автор з id {id} не існує"
                 };
             }
 
             return new ServiceResponse
             {
                 Message = "Автор успішно отриманий",
-                Payload = new AuthorDto
-                {
-                    Id = entity.Id,
-                    BirthDate = entity.BirthDate,
-                    Image = entity.Image,
-                    Name = entity.Name
-                }
+                Payload = _mapper.Map<AuthorDto>(entity)
             };
         }
 
         public async Task<ServiceResponse> GetAllAsync()
         {
-            var dtos = await _authorRepository.Authors
-                .Select(a => new AuthorDto { Name = a.Name, BirthDate = a.BirthDate, Id = a.Id, Image = a.Image })
-                .ToListAsync();
+            var entities = await _authorRepository.Authors.ToListAsync();
+            var dtos = _mapper.Map<List<AuthorDto>>(entities);
+
             return new ServiceResponse 
             {
                 Message = "Автори отримано",

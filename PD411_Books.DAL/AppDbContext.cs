@@ -50,6 +50,9 @@ namespace PD411_Books.DAL
 
                 e.Property(a => a.Image)
                 .HasMaxLength(100);
+
+                e.Property(a => a.Country)
+                .HasMaxLength(50);
             });
 
             // Genres
