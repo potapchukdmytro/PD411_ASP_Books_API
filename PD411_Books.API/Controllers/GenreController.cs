@@ -31,7 +31,7 @@ namespace PD411_Books.API.Controllers
             return this.GetAction(response);
         }
 
-        [HttpGet("name/{name}")]
+        [HttpGet("by-name/{name}")]
         public async Task<IActionResult> GetAsync(string name)
         {
             var response = await _genreService.GetByNameAsync(name);
@@ -56,6 +56,13 @@ namespace PD411_Books.API.Controllers
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var response = await _genreService.DeleteAsync(id);
+            return this.GetAction(response);
+        }
+
+        [HttpDelete("by-name/{name}")]
+        public async Task<IActionResult> DeleteAsync(string name)
+        {
+            var response = await _genreService.DeleteAsync(name);
             return this.GetAction(response);
         }
     }

@@ -25,7 +25,7 @@ namespace PD411_Books.BLL.Services
                 return new ServiceResponse
                 {
                     Success = false,
-                    Message = $"Жанр з назвою '{dto.Name}' вже існує"
+                    Message = $"Жанр '{dto.Name}' вже існує"
                 };
             }
 
@@ -67,7 +67,7 @@ namespace PD411_Books.BLL.Services
                 return new ServiceResponse
                 {
                     Success = false,
-                    Message = $"Жанр з назвою '{dto.Name}' вже існує"
+                    Message = $"Жанр '{dto.Name}' вже існує"
                 };
             }
 
@@ -123,6 +123,37 @@ namespace PD411_Books.BLL.Services
             };
         }
 
+        public async Task<ServiceResponse> DeleteAsync(string name)
+        {
+            var entity = await _genreRepository.GetByNameAsync(name);
+
+            if (entity == null)
+            {
+                return new ServiceResponse
+                {
+                    Success = false,
+                    Message = $"Жанр '{name}' не існує"
+                };
+            }
+
+            var res = await _genreRepository.DeleteAsync(entity);
+
+            if (!res)
+            {
+                return new ServiceResponse
+                {
+                    Success = false,
+                    Message = "Не вдалося видалити жанр"
+                };
+            }
+
+            return new ServiceResponse
+            {
+                Message = $"Жанр '{entity.Name}' успішно видалений",
+                Payload = _mapper.Map<GenreDto>(entity)
+            };
+        }
+
         public async Task<ServiceResponse> GetByIdAsync(int id)
         {
             var entity = await _genreRepository.GetByIdAsync(id);
@@ -152,7 +183,7 @@ namespace PD411_Books.BLL.Services
                 return new ServiceResponse
                 {
                     Success = false,
-                    Message = $"Жанр з іменем '{name}' не існує"
+                    Message = $"Жанр '{name}' не існує"
                 };
             }
 
