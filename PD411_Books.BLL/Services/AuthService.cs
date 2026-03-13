@@ -56,8 +56,7 @@ namespace PD411_Books.BLL.Services
 
             return new ServiceResponse
             {
-                Message = "Ви успішно зареєструвалися",
-                Payload = userEntity
+                Message = "Ви успішно зареєструвалися"
             };
         }
 

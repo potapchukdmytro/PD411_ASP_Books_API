@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PD411_Books.DAL.Entities;
+using PD411_Books.DAL.Entities.Identity;
 
 namespace PD411_Books.DAL.Initializer
 {
@@ -11,9 +13,62 @@ namespace PD411_Books.DAL.Initializer
         {
             using var scope = app.ApplicationServices.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUserEntity>>();
+            using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRoleEntity>>();
 
             await context.Database.MigrateAsync();
 
+            // Roles
+            if (!roleManager.Roles.Any())
+            {
+                var adminRole = new AppRoleEntity
+                {
+                    Name = "admin"
+                };
+
+                var userRole = new AppRoleEntity
+                {
+                    Name = "user"
+                };
+
+                await roleManager.CreateAsync(adminRole);
+                await roleManager.CreateAsync(userRole);
+            }
+
+            // Users
+            if (await userManager.FindByEmailAsync("admin@mail.com") == null
+                && await userManager.FindByNameAsync("admin") == null)
+            {
+                var admin = new AppUserEntity
+                {
+                    UserName = "admin",
+                    Email = "admin@mail.com",
+                    EmailConfirmed = true,
+                    FirstName = "Admin",
+                    LastName = "Bookland"
+                };
+
+                await userManager.CreateAsync(admin);
+                await userManager.AddToRoleAsync(admin, "admin");
+            }
+
+            if (await userManager.FindByEmailAsync("user@mail.com") == null
+                && await userManager.FindByNameAsync("user") == null)
+            {
+                var user = new AppUserEntity
+                {
+                    UserName = "user",
+                    Email = "user@mail.com",
+                    EmailConfirmed = true,
+                    FirstName = "User",
+                    LastName = "Bookland"
+                };
+
+                await userManager.CreateAsync(user);
+                await userManager.AddToRoleAsync(user, "user");
+            }
+
+            // Genres, Books, Authors
             var genres = new List<GenreEntity>();
 
             if (!context.Genres.Any())
@@ -34,7 +89,7 @@ namespace PD411_Books.DAL.Initializer
 
             if (!context.Authors.Any())
             {
-                if(genres.Count == 0)
+                if (genres.Count == 0)
                 {
                     genres = await context.Genres.ToListAsync();
                 }

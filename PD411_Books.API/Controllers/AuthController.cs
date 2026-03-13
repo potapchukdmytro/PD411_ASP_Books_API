@@ -16,7 +16,7 @@ namespace PD411_Books.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto dto)
         {
             var response = await _authService.RegisterAsync(dto);
